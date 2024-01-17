@@ -4,11 +4,8 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 import lombok.Data;
-import ventures.of.MainProgram;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
 
 @Data
 public class BatteryController {
@@ -25,17 +22,19 @@ public class BatteryController {
     private static final int CALIBRATION_REGISTER = 0x05;
 
     private static final int CALIBRATION_VALUE = 26868;
+    private final MasterController masterController;
     private I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
     private I2CDevice device = bus.getDevice(I2C_ADDRESS);
 
-    private double lastBattery = 0;
-    private double lastAmpOut = 0;
-    private double lastWattOut = 0;
+    private double lastBattery;
+    private double lastAmpOut;
+    private double lastWattOut;
 
     private long timeToUpdateSeconds = 10;
     private long lastUpdate = 0;
 
-    public BatteryController() throws IOException, I2CFactory.UnsupportedBusNumberException {
+    public BatteryController(MasterController masterController) throws IOException, I2CFactory.UnsupportedBusNumberException {
+        this.masterController = masterController;
         lastWattOut = getWattage(device, BUS_WATTAGE_REGISTER);
         lastAmpOut = getAmperage(device, BUS_CURRENT_REGISTER);
         lastBattery = getBattery(device, BUS_VOLTAGE_REGISTER);
@@ -48,31 +47,22 @@ public class BatteryController {
             lastWattOut = getWattage(device, BUS_WATTAGE_REGISTER);
             lastAmpOut = getAmperage(device, BUS_CURRENT_REGISTER);
             lastBattery = getBattery(device, BUS_VOLTAGE_REGISTER);
-            MainProgram.cameraMenu.getBatteryLabel().setText(buildBatteryLabelString());
         }
     }
 
-    /*
-            public static void getBatteryInfo() throws IOException, I2CFactory.UnsupportedBusNumberException {
-
-            ("shunt voltage: " + roundToThreeDecimals((getValue(device, SHUNT_VOLTAGE_REGISTER) >> 3) * 0.004) + "V");
-            ("Voltage bus: " + roundToThreeDecimals(((getValue(device, BUS_VOLTAGE_REGISTER) >> 3) * 0.004)) + "V");
-            ("Power bus: " + roundToThreeDecimals((getValue(device, BUS_WATTAGE_REGISTER) * 0.003048)) + "W");
-            ("Current bus: " + roundToThreeDecimals(((getValue(device, BUS_CURRENT_REGISTER) / 1000f) * 0.1524)) + "mAh");
-            ("Battery: " + roundToThreeDecimals((((getValue(device, BUS_VOLTAGE_REGISTER) >> 3) * 0.004)-3) / 1.2 * 100) + "%");
-        }
-
-     */
     private static double getBattery(I2CDevice device, int register) throws IOException {
         return ((getVoltage(device, register) - 3) / 1.2f * 100);
     }
+
     private static double getVoltage(I2CDevice device, int register) throws IOException {
         return (getValue(device, register) >> 3) * 0.004d;
     }
+
     private static double getWattage(I2CDevice device, int register) throws IOException {
-       // device.write(CALIBRATION_REGISTER, toByte(CALIBRATION_VALUE));
+        // device.write(CALIBRATION_REGISTER, toByte(CALIBRATION_VALUE));
         return getValue(device, register) * 0.003048d;
     }
+
     private static double getAmperage(I2CDevice device, int register) throws IOException {
         return (getValue(device, register) / 1000d) * 0.1524d;
     }
@@ -94,7 +84,7 @@ public class BatteryController {
     }
 
     public String buildBatteryLabelString() {
-        return getFormat(lastBattery, "%") + " (" +getFormat(lastWattOut, "W")+")";
+        return getFormat(lastBattery, "%") + " (" + getFormat(lastWattOut, "W") + ")";
     }
 
     public String getFormat(double input, String symbol) {
@@ -106,7 +96,4 @@ public class BatteryController {
         }
     }
 
-private static byte[] toByte(Integer i) {
-    return BigInteger.valueOf(i).toByteArray();
-}
 }

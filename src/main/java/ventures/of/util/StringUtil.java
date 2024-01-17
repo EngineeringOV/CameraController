@@ -7,41 +7,31 @@ import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 
 @Slf4j
 public class StringUtil {
 
-
     public static String formatIntoShorterString(long value) {
-        NavigableMap<Long, String> suffixes = new TreeMap<>();
-        suffixes.put(1_000L, "k");
-        suffixes.put(1_000_000L, "M");
-        suffixes.put(1_000_000_000L, "G");
-        suffixes.put(1_000_000_000_000L, "T");
-        suffixes.put(1_000_000_000_000_000L, "P");
-        suffixes.put(1_000_000_000_000_000_000L, "E");
-        //Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
-        if (value == Long.MIN_VALUE) {
-            return formatIntoShorterString(Long.MIN_VALUE + 1);
-        }
+        return formatIntoShorterString(value, NumberNotations.MATH_NOTATION_SUFFIXES.getMap());
+    }
+
+    public static String formatIntoShorterString(long value, NotationMap<Long, String> notation) {
+        short maxDecimals = 2;
+        Map.Entry<Long, String> closestLowerSuffix = notation.floorEntry(value);
+        //A simple hack for negative values, recursively running this method with the value as the absolute and adding a "-" to the string that is returned from the top call
         if (value < 0) {
             return "-" + formatIntoShorterString(-value);
         }
-        if (value < 1000) {
-            return Long.toString(value); //deal with easy case
+        //When there's no suffix then don't use one
+        else if (closestLowerSuffix == null) {
+            return Long.toString(value);
         }
+        double divideBy = closestLowerSuffix.getKey();
+        String suffix = closestLowerSuffix.getValue();
+        String truncated = truncateToXDecimals(value / divideBy, maxDecimals);
 
-        Map.Entry<Long, String> e = suffixes.floorEntry(value);
-        Long divideBy = e.getKey();
-        String suffix = e.getValue();
-
-        long truncated = value / (divideBy / 10); //the number part of the output times 10
-        boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
-        return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
+        return truncated + suffix;
     }
-
 
     public static String getCurrentTimeShort(){
         LocalDateTime now = LocalDateTime.now();
@@ -61,10 +51,16 @@ public class StringUtil {
         }
     }
 
-    public static String roundToThreeDecimals(double raw) {
-        DecimalFormat df = new DecimalFormat("#.##");
-        df.setRoundingMode(RoundingMode.CEILING);
+    // Removes unnecessary decimals as a nice bonus
+    public static String truncateToXDecimals(double raw, int decimals) {
+        StringBuilder pattern = new StringBuilder("#.");
+        for (int i = 0; i < decimals; i++) {
+            pattern.append("#");
+        }
+        DecimalFormat df = new DecimalFormat(pattern.toString());
+        df.setRoundingMode(RoundingMode.FLOOR);
 
         return df.format(raw);
     }
+
 }

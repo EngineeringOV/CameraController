@@ -1,5 +1,7 @@
 package ventures.of.view;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -10,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+@Slf4j
 public class ImageViewerView extends JPanel {
     static ArrayList<Frame> frames = new ArrayList<>();
     private final BufferedImage image;
@@ -41,17 +44,15 @@ public class ImageViewerView extends JPanel {
     }
 
     public static void  createView(int dividerX, int dividerY, int x, int y, String imageName) {
-
         destroyFrames();
         // Load the original image
         BufferedImage originalImage = null;
         try {
             originalImage = ImageIO.read(new File(imageName));
         } catch (IOException e) {
-            System.out.println("Error loading the original image: " + e.getMessage());
+            log.info("Error loading the original image: " + e.getMessage());
             //System.exit(1);
         }
-
         BufferedImage finalOriginalImage = originalImage;
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("ImageViewer");

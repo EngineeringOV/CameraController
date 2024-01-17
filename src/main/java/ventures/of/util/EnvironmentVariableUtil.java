@@ -4,8 +4,11 @@ import ventures.of.MainProgram;
 
 public class EnvironmentVariableUtil {
 
+    public static Boolean getPropertyBool(String key) {
+        return Boolean.valueOf(getPropertyString(key));
+    }
 
-    public static String getProperty(String key) {/*
+    public static String getPropertyString(String key) {/*
         // In override
         String overrideValue = MainProgram.properties.getProperty(key);
         // In system

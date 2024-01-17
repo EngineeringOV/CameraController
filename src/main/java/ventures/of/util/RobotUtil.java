@@ -6,15 +6,13 @@ import java.awt.event.InputEvent;
 import static ventures.of.util.StringUtil.printVerbose;
 
 public class RobotUtil {
-    public static void maximizeWindow(int initialDelay) {
+    public static Void maximizeWindow(int initialDelay) {
         new Thread(() -> {
             try {
                 printVerbose("maximizing", false);
                 Robot robot = new Robot();
-
-                    robot.delay(initialDelay);
+                robot.delay(initialDelay);
                 robot.mouseMove(155, 15);
-
                 robot.mousePress(InputEvent.BUTTON1_MASK);
                 robot.mouseRelease(InputEvent.BUTTON1_MASK);
                 robot.delay(500);
@@ -24,5 +22,6 @@ public class RobotUtil {
                 e.printStackTrace();
             }
         }).start();
+        return null;
     }
 }

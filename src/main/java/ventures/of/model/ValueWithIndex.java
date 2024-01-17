@@ -27,17 +27,18 @@ public class ValueWithIndex {
     }
 
     public Number getActualValue() {
-       return values[index];
+        return values[index];
     }
 
     public Void incrementIndexBy(int indexChange) {
-        index = MathUtil.incrementByAndReturnAround(index+indexChange, 0, values.length-1);
+        index = MathUtil.incrementByAndReturnAround(index + indexChange, 0, values.length - 1);
         return null;
     }
+
     public Void restoreDefault() {
         index = defaultIndex;
         return null;
     }
 
-    }
+}
 

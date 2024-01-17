@@ -1,7 +1,6 @@
 package ventures.of.util;
 
 import lombok.extern.slf4j.Slf4j;
-import ventures.of.MainProgram;
 import ventures.of.model.NamedProcess;
 
 import java.io.BufferedReader;
@@ -39,7 +38,7 @@ public class ProcessUtil {
         return null;
     }
 
-    public static String getProccessWindow(String pid) {
+    public static String getProcessWindow(String pid) {
         try {
             Process p = Runtime.getRuntime().exec("xdotool search --pid " + pid);
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -67,7 +66,7 @@ public class ProcessUtil {
         try {
             Process process = Runtime.getRuntime().exec(command, env);
             String programName = command.split(" ")[0];// + " " + command.split(" ")[1];
-            if(programName.contains("sudo")) {
+            if (programName.contains("sudo")) {
                 programName = command.split(" ")[1];
             }
             processes.add(new NamedProcess(programName, process));
@@ -90,15 +89,13 @@ public class ProcessUtil {
 
     public static Void rebootAction() {
         log.info("Rebooting");
-        MainProgram.cameraController.killLibCamera();
         runCommand("sudo reboot", true, true);
         return null;
     }
 
     public static Void shutdownAction() {
         log.info("Shutting down");
-        ledContinous();
-        MainProgram.cameraController.killLibCamera();
+        ledContinuous();
         runCommand("sudo shutdown -h now", true, true);
         return null;
     }
@@ -109,7 +106,7 @@ public class ProcessUtil {
 
 
     //todo fix led settings
-    //these seem to each get 50% of the leds time
+    //these seem to each get 50% of the LEDs time
     //mmc0 seems to have a inverted logic 0 = on 1 = off in the brightness file
     //default-on seems to have a 1 = on 0= off in the brightness file
     public static void ledSetManualMode() {
@@ -121,12 +118,13 @@ public class ProcessUtil {
         runCommand("sudo sh -c \"echo 1 > /sys/class/leds/mmc0/brightness\"");
         runCommand("sudo sh -c \"echo 0 > /sys/class/leds/default-on/brightness\"");
     }
+
     public static void ledBlinking() {
         runCommand("sudo sh -c \"echo 1 > /sys/class/leds/mmc0/brightness\"");
         runCommand("sudo sh -c \"echo 1 > /sys/class/leds/default-on/brightness\"");
     }
 
-    public static void ledContinous() {
+    public static void ledContinuous() {
         runCommand("sudo sh -c \"echo 0 > /sys/class/leds/mmc0/brightness\"");
         runCommand("sudo sh -c \"echo 1 > /sys/class/leds/default-on/brightness\"");
     }

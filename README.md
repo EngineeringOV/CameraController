@@ -1,5 +1,5 @@
 # Note
-This code isn't perfect, it was made to be written quick and refactored afterwards, refactoring has started but it's still a WIP
+This code isn't perfect, it was made to be written quick and refactored afterwards, refactoring is in progress
 
 # Installation
 
@@ -23,17 +23,6 @@ sudo dphys-swapfile swapon
 ````
 - fix desktop env ( make bar small, set background, make bar auto hide, remove icons from desk+bar, disallow panel reserving space from maximized windows )
 - install battery + display drivers (Instructions below)
-- install this program as a service by installing ````./src/main/resources/cameracontroller.service```` as
-```` /etc/systemd/system/cameracontroller.service````
-and then start it by running
-````shell
-sudo systemctl enable cameracontroller.service
-sudo systemctl start cameracontroller.service
-````
-and if you're having problems you can see logs by running
-````shell
-sudo journalctl -u cameracontroller.service -f
-````
 
 ## 1.3 inch display drivers
 
@@ -43,11 +32,11 @@ mkdir ~/Downloads/
 ````
 ````shell
 cd ~/Downloads
-wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.71.tar.gz
+wget https://www.airspayce.com/mikem/bcm2835/bcm2835-1.71.tar.gz
 tar zxvf bcm2835-1.71.tar.gz 
 cd bcm2835-1.71/
 sudo ./configure && sudo make && sudo make check && sudo make install
-# For more, you can refer to the official website at: http://www.airspayce.com/mikem/bcm2835/
+# For more, you can refer to the official website at: https://www.airspayce.com/mikem/bcm2835/
 ````
 ````shell
 cd ~/Downloads
@@ -63,7 +52,7 @@ sudo apt-get install python3-pip
 sudo pip3 install RPi.GPIO
 sudo pip3 install spidev
 ````
-Notice that the cmake below differs from the one on waveshares instructions because -DBACKLIGHT_CONTROL=OFF is flagged as off
+Notice that the cmake below differs from the one on WaveShares instructions because -DBACKLIGHT_CONTROL=OFF is flagged as off
 ````shell
 cd ~/Downloads/
 wget https://www.waveshare.com/w/upload/f/f9/Waveshare_fbcp.7z
@@ -80,21 +69,48 @@ sudo nano /etc/rc.local
 ````
 Then add ````fbcp&```` before exit 0
 
-- Do ````sudo nano /boot/config.txt```` And add
+##Setting up config
+
+- Do ````sudo nano /boot/config.txt```` And at the bottom add
 ````
+#Speeds up boot
+disable_splash=1
+dtoverlay=disable-bt
+boot_delay=0
+#Sets display settings for our fancy display
 hdmi_force_hotplug=1
 hdmi_cvt=300 300 60 1 0 0 0
 hdmi_group=2
 hdmi_mode=87
 display_rotate=0
+
+#Makes sure the wifi doesn't crash as it can running with air cooling
+arm_freq=600
+gpu_freq=300
+sdram_freq=400
+#Leaves enough RAM for camera as camera doesn't share with GPU_MEM.
+gpu_mem=32
+#Sets the right camera driver
+dtoverlay=imx477,media-controller=0
 ````
 
-# UPS HAT
-
+## Compile
+- Copy ```src/main/resources/config.properties.default``` and to ```src/main/resources/config.properties``` and fill it out as you want it
+- Compile this program
+- Put the resulting JAR in ~/projects
+- Install this program as a service by installing ````./src/main/resources/cameracontroller.service```` as
+  ```` /etc/systemd/system/cameracontroller.service````
+  and then start it by running
 ````shell
-cd ~/Downloads/
-wget https://www.waveshare.com/w/upload/4/40/UPS_HAT_C.7z
-7zr x UPS_HAT_C.7z -r -o./
-cd UPS_HAT_C
-python3 INA219.py
+sudo systemctl enable cameracontroller.service
+sudo systemctl start cameracontroller.service
 ````
+and if you're having problems you can see logs by running
+````shell
+sudo journalctl -u cameracontroller.service -f
+````
+And then in the terminal do
+````bash
+sudo reboot
+````
+### If the camera starts correctly then you did everything correctly and you're now done

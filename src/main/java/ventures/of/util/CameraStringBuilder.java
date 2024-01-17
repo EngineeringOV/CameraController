@@ -2,18 +2,18 @@ package ventures.of.util;
 
 import java.io.File;
 
-//welcome to the ugliest builder class you ever seen
 public class CameraStringBuilder {
     private final StringBuilder command = new StringBuilder();
 
-    // todo seperate to 3 individual ones for images, video, timelapse
-    private CameraStringBuilder(String initialCommand) {
+    CameraStringBuilder(String initialCommand) {
         this.command.append(initialCommand);
     }
+
     public String build() {
         command.append(" --qt-preview");
         return command.toString();
     }
+
     public static CameraStringBuilder builder(String initialCommand) {
         return new CameraStringBuilder(initialCommand);
     }
@@ -24,6 +24,7 @@ public class CameraStringBuilder {
         command.append(" -o ").append(var);
         return this;
     }
+
     public CameraStringBuilder outputDirAndName(String var) {
         File asFile = new File(var.substring(0, var.lastIndexOf("/")));
         asFile.mkdirs();
@@ -33,14 +34,6 @@ public class CameraStringBuilder {
 
     public CameraStringBuilder timeout(long var) {
         command.append(" -t ").append(var);
-        return this;
-    }
-    public CameraStringBuilder h264TargetLevel(double var) {
-        command.append(" --level ").append(var);
-        return this;
-    }
-    public CameraStringBuilder h264TargetLevel4() {
-        command.append(" --level 4");
         return this;
     }
 
@@ -55,7 +48,7 @@ public class CameraStringBuilder {
     }
 
     public CameraStringBuilder saturation(double var) {
-        if(var == -1){
+        if (var == -1) {
             return this;
         }
         command.append(" --saturation ").append(var);
@@ -64,11 +57,6 @@ public class CameraStringBuilder {
 
     public CameraStringBuilder denoise(String var) {
         command.append(" --denoise ").append(var);
-        return this;
-    }
-
-    public CameraStringBuilder timeBetweenImagesTimelapse(long var) {
-        command.append(" --timelapse ").append(var);
         return this;
     }
 
@@ -83,7 +71,7 @@ public class CameraStringBuilder {
     }
 
     public CameraStringBuilder gain(double var) {
-        if(var == -1){
+        if (var == -1) {
             return this;
         }
 
@@ -101,7 +89,6 @@ public class CameraStringBuilder {
         return this;
     }
 
-
     public CameraStringBuilder widthViewfinder(int var) {
         command.append(" --viewfinder-width ").append(var);
         return this;
@@ -112,22 +99,18 @@ public class CameraStringBuilder {
         return this;
     }
 
-
     public CameraStringBuilder preview(int x, int y, int width, int height) {
         command.append(" --preview ").append(x).append(",").append(y).append(",").append(width).append(",").append(height);
         return this;
     }
 
-
-    // https://forums.raspberrypi.com/viewtopic.php?t=323733 idk
     public CameraStringBuilder shutter(long var) {
-        if(var == -1){
+        if (var == -1) {
             return this;
         }
-        command.append(/* --framerate 10 */"--shutter ").append(var);
+        command.append(" --shutter ").append(var);
         return this;
     }
-
 
     public CameraStringBuilder verbose(int var) {
         command.append(" -v ").append(var);
@@ -140,7 +123,7 @@ public class CameraStringBuilder {
     }
 
     public CameraStringBuilder brightness(double var) {
-        if(var == -1){
+        if (var == -1) {
             return this;
         }
 
@@ -170,11 +153,6 @@ public class CameraStringBuilder {
 
     public CameraStringBuilder datetime() {
         command.append(" --datetime");
-        return this;
-    }
-
-    public CameraStringBuilder framerate(double var) {
-        command.append(" --framerate ").append(var);
         return this;
     }
 
