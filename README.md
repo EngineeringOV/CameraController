@@ -1,12 +1,25 @@
 # Note
 This code isn't perfect, it was made to be written quick and refactored afterwards, refactoring is in progress
 
+# BOM ( todo Update with links)
+
+- Raspberry Pi Zero 2 (Zero 1 could probably work but you'd have to fork and remove some more CPU and Memory instense features)
+- SD card
+- Raspberry HQ camera module (Or other similar)
+- 3d printer (or baseplate for Module+Raspberry)
+- Waveshare 1.3 inch display HAT
+- Waveshare UPS HAT (C) (That one that is the size of a Raspberry pi zero)
+- M2.5 screws and standoffs
+- Any C-mount camera lens you want to use (Or an adapter to other mount)
+- ***Optional*** tripod mount with screw for Camera-module
+
 # Installation
 
 - ````mkdir ~/projects````
 - install rpi os on sd card ( Needs to be 32bit for FBCP display driver)
 - ````sudo raspi-config```` and activate I2C + SPI + SSH + VNI under ````interface options```` and legacy driver under ````advanced options -> GL Driver````
 - Deactivate screen blanking
+- Save settings and exit raspi-config
 - ````sudo apt install openjdk-8-jdk git guake cmake p7zip-full -y````
 - ````sudo nano /boot/config.txt```` and add  ```
   disable_splash=1
@@ -14,10 +27,17 @@ This code isn't perfect, it was made to be written quick and refactored afterwar
   boot_delay=0```
 - ````sudo nano /boot/cmdline.txt```` and change ````tty=1```` to ````tty=3```` and add ````quiet loglevel=3 quiet logo.nologo nosplash cma=375M```` after ````rootwait```` or replace if they exist with different values
 - ````systemctl disable ModemManager.service && systemctl disable hciuart.service````
--
+- Set your swap memory by
+
+1: 
 ````shell
 sudo dphys-swapfile swapoff
 sudo nano /etc/dphys-swapfile
+````
+and write the amount (todo default amount)
+
+2: Set Save and Exit and finish it by  
+````
 sudo dphys-swapfile setup
 sudo dphys-swapfile swapon
 ````
