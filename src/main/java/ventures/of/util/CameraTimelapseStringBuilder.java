@@ -1,15 +1,17 @@
 package ventures.of.util;
 
-public class CameraTimelapseStringBuilder extends CameraStringBuilder{
-    private final StringBuilder command = new StringBuilder();
+public class CameraTimelapseStringBuilder extends CameraStringBuilder {
 
     private CameraTimelapseStringBuilder() {
-        super("libcamera-vid");
+        super("libcamera-still ");
     }
+
     public String build() {
         command.append(" --qt-preview");
+
         return command.toString();
     }
+
     public static CameraTimelapseStringBuilder builder() {
         return new CameraTimelapseStringBuilder();
     }

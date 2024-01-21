@@ -2,7 +2,6 @@ package ventures.of.controller;
 
 import com.pi4j.io.gpio.*;
 import lombok.Data;
-import ventures.of.MainProgram;
 import ventures.of.util.EnvironmentVariableUtil;
 import ventures.of.util.MathUtil;
 import ventures.of.util.ProcessUtil;
@@ -14,7 +13,7 @@ import static ventures.of.util.StringUtil.printVerbose;
 public class DisplayController {
     private int backlight = 80;
     private int backlightChange = 80;
-    boolean buttonVerbose = EnvironmentVariableUtil.getPropertyBool("camera.settings.log.button.presses");
+    boolean buttonVerbose = EnvironmentVariableUtil.getPropertyBool("camera.settings.log.verbose.buttons");
 
     private GpioController gpio;
     private GpioPinDigitalInput click, button1, button2, button3, up, down, left, right;
@@ -34,9 +33,6 @@ public class DisplayController {
         right = gpio.provisionDigitalInputPin(RaspiBcmPin.GPIO_25, PinPullResistance.PULL_UP);
 
         runCommand("sudo pigpiod", false);
-        //backlightPwm.setPwmRange(255);
-        //updateBacklightCliAction(80);
-
 
         //BUTTON1
         PinListenerImpl b1Listener = new PinListenerImpl("button1", buttonVerbose, button1);

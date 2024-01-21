@@ -21,33 +21,40 @@ public class CameraController {
     private final String VIDEO_DIR = EnvironmentVariableUtil.getPropertyString("camera.settings.function.video.dir");
     private final String TIMELAPSE_DIR = EnvironmentVariableUtil.getPropertyString("camera.settings.function.timelapse.dir");
     private final String IMAGES_DIR = EnvironmentVariableUtil.getPropertyString("camera.settings.function.image.dir");
+    private final int verboseCamera = EnvironmentVariableUtil.getPropertyInt("camera.settings.log.verbose.camera");
     @Getter
     private static final String LATEST_FILE = EnvironmentVariableUtil.getPropertyString("camera.settings.function.lastimage.dir");
     private final MasterController masterController;
     // Marked speed to shutter time basically follows fps calculation according to https://www.flutotscamerarepair.com/Shutterspeed.htm
     // but seems to be off by an unknown factor
-    private ValueWithIndex shutterTime = new ValueWithIndex(0, 0, new Number[]{-1, 1, 50, 25_000L, 100_000L, 1_000_000L, 10_000_000L, 100_000_000L});
+    private ValueWithIndex shutterTime = new ValueWithIndex(0, 0, new Number[]{-1L, 1L, 50L, 25_000L, 100_000L, 1_000_000L, 10_000_000L, 100_000_000L});
     // ISO = 100 * 2^(gain)
     // ISO = 100 * 2^2 = 400
-    private ValueWithIndex gain = new ValueWithIndex(1, 0.5, 1, 2.5, 5, 7.5, 10);
+    private ValueWithIndex gain = new ValueWithIndex(1, 0.5, 1, 2.5, 5, 7.5, 10, 15, 20);
     private ValueWithIndex tlTimeBetween = new ValueWithIndex(2, 1_000L, 5_000L, 10_000L, 30_000L, 60_000L, 120_000L, 600_000L);
     private ValueWithIndex saturation, quality, fps, resolution;
     private ValueWithIndex[] settings = {shutterTime, gain, tlTimeBetween/*, saturation, quality, fps, resolution*/};
 
+
+    //NYI
     private String buildVideoString() {
         return CameraVideoStringBuilder
                 .builder()
                 .framerate(30)
-                .h264TargetLevel4()
-                .width(1280)
-                .height(720)
+                //.codec("libav")
+                .codec("h264")
+                .profile("high")
+                .mode("640:480:30")
+                .h264TargetLevel(4.1)
+                .width(640)
+                .height(480)
                 .sharpness(1.5)
                 .contrast(1.2)
                 .noPreview()
                 .timeout(60000)
                 .outputDirAndName(VIDEO_DIR + StringUtil.getCurrentTime() + ".h264")
                 .denoise("cdn_off")
-                .verbose(0)
+                .verbose(verboseCamera)
                 .build();
     }
 
@@ -63,14 +70,14 @@ public class CameraController {
                 .contrast(1.2)
                 .denoise("cdn_hq")
                 .quality(100)
-                .verbose(0)
+                .verbose(verboseCamera)
                 .latest(LATEST_FILE)
                 .build();
     }
 
     private String buildSnapshotString() {
         return CameraStringBuilder
-                .builder("libcamera-still")
+                .builder()
                 .timeoutDisabled()
                 .outputDirNoName(IMAGES_DIR)
                 .timestamp()
@@ -81,14 +88,14 @@ public class CameraController {
                 .contrast(1.1)
                 .denoise("cdn_hq")
                 .quality(100)
-                .verbose(0)
+                .verbose(verboseCamera)
                 .latest(LATEST_FILE)
                 .build();
     }
 
     public CameraController(MasterController masterController) {
         this.masterController = masterController;
-        File latest = new File(EnvironmentVariableUtil.getPropertyString("camera.settings.function.lastimage.dir"));
+        File latest = new File(LATEST_FILE);
         latest.delete();
         cameraStatus = CameraStates.READY;
     }

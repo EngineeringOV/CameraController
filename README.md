@@ -1,5 +1,6 @@
 # Note
-This code isn't perfect, it was made to be written quick and refactored afterwards, refactoring is in progress
+- This code isn't perfect, it was made to be written quick and refactored afterwards, refactoring is in progress
+- Video doesn't work yet, it worked with the zero 1 but after upgrading to zero 2 it only allows video capture of at most 380x380 which is a garbage resolution, this is probably related to changes in memory settings etc and needs to be explored but should be fixable.
 
 # BOM ( todo Update with links)
 
@@ -42,7 +43,7 @@ sudo dphys-swapfile setup
 sudo dphys-swapfile swapon
 ````
 - fix desktop env ( make bar small, set background, make bar auto hide, remove icons from desk+bar, disallow panel reserving space from maximized windows )
-- install battery + display drivers (Instructions below)
+- install  display drivers (Instructions below) and ***Optional*** battery code examples 
 
 ## 1.3 inch display drivers
 
@@ -97,6 +98,7 @@ Then add ````fbcp&```` before exit 0
 disable_splash=1
 dtoverlay=disable-bt
 boot_delay=0
+
 #Sets display settings for our fancy display
 hdmi_force_hotplug=1
 hdmi_cvt=300 300 60 1 0 0 0
@@ -108,8 +110,10 @@ display_rotate=0
 arm_freq=600
 gpu_freq=300
 sdram_freq=400
+
 #Leaves enough RAM for camera as camera doesn't share with GPU_MEM.
 gpu_mem=32
+
 #Sets the right camera driver
 dtoverlay=imx477,media-controller=0
 ````

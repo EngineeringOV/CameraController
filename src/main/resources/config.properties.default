@@ -1,19 +1,30 @@
 discord.api.token=replace me
+
+camera.settings.log.verbose.buttons=false
+camera.settings.log.startup=false
+camera.settings.log.verbose.camera=0
+
+camera.settings.function.lastimage.dir=/home/pi-camera/projects/latest.jpg
+
+
+camera.settings.function.video.dir=/home/pi-camera/projects/images/video/
+camera.settings.function.timelapse.dir=/home/pi-camera/projects/images/timelapses/
+camera.settings.function.image.dir=/home/pi-camera/projects/images/
+
+camera.settings.function.boot.toSnapshot=true
+
+
+NYI=Below
 discord.api.whitelist.id=
 
-camera.settings.log.button.presses=false
-camera.settings.log.startup=false
+camera.settings.function.battery.update=true
 
 camera.settings.function.lastimage.xview=1
 camera.settings.function.lastimage.yview=1
 camera.settings.function.lastimage.xdivisions=3
 camera.settings.function.lastimage.ydivisions=3
 camera.settings.function.lastimage.show=true
-camera.settings.function.lastimage.dir=/home/pi-camera/projects/latest.jpg
 
-camera.settings.function.battery.update=true
-
-camera.settings.function.video.dir=/home/pi-camera/projects/images/video/
-camera.settings.function.timelapse.dir=/home/pi-camera/projects/images/timelapses/
-camera.settings.function.image.dir=/home/pi-camera/projects/images/
-
+camera.settings.function.ssh.username=pi-camera
+camera.settings.function.ssh.hostname=camera2
+camera.settings.function.ssh.jarPath=/home/pi-camera/projects/cameraController-1.jar

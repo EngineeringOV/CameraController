@@ -8,6 +8,10 @@ public class EnvironmentVariableUtil {
         return Boolean.valueOf(getPropertyString(key));
     }
 
+    public static int getPropertyInt(String key) {
+        return Integer.parseInt(getPropertyString(key));
+    }
+
     public static String getPropertyString(String key) {/*
         // In override
         String overrideValue = MainProgram.properties.getProperty(key);

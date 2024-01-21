@@ -3,7 +3,7 @@ package ventures.of.util;
 import java.io.File;
 
 public class CameraStringBuilder {
-    private final StringBuilder command = new StringBuilder();
+    final StringBuilder command = new StringBuilder();
 
     CameraStringBuilder(String initialCommand) {
         this.command.append(initialCommand);
@@ -12,6 +12,10 @@ public class CameraStringBuilder {
     public String build() {
         command.append(" --qt-preview");
         return command.toString();
+    }
+
+    public static CameraStringBuilder builder() {
+        return new CameraStringBuilder("libcamera-still ");
     }
 
     public static CameraStringBuilder builder(String initialCommand) {

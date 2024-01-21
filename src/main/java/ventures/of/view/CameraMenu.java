@@ -37,28 +37,36 @@ public class CameraMenu {
     //private MenuItem showLastImage = new MenuItem("Sharpness", (e -> cameraController.killLibCamera()));
     //private MenuItem showLastImage = new MenuItem("Contrast", (e -> cameraController.killLibCamera()));
     // private MenuItem backlightItem = new MenuItem("Backlight", null);
-
-    private ValueWithIndex shutterTime = masterController.cameraController.getShutterTime();
-    private ValueWithIndex gain = masterController.cameraController.getGain();
-    private ValueWithIndex timeBetween = masterController.cameraController.getTlTimeBetween();
-
-    private MenuItem shutterItem = new MenuItemSetting("Shutter",shutterTime);
-    private MenuItem gainItem = new MenuItemSetting("Gain",  gain, "db");
-    private MenuItem timeBetweenItem = new MenuItemSetting("TL time", timeBetween);
-    private MenuItem restoreDefaultsItem = new MenuItem("Restore defaults", (e -> {
-        Arrays.stream(masterController.cameraController.getSettings()).forEach(ValueWithIndex::restoreDefault);
-        return null;
-    }));
-
-
-    private MenuItem[] settings = {toggleMenuItem, shutdownItem, rebootItem, maximizeItem, killCamItem, showLastImage, timeBetweenItem, shutterItem, gainItem, restoreDefaultsItem};
-    private Font labelFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 20);
-    private SelectedLabel selectedLabel = new SelectedLabel(settings[currentItem].getName().apply(null), labelFont);
-    private BatteryLabel batteryLabel = new BatteryLabel(masterController.batteryController.buildBatteryLabelString(), labelFont);
-    private CameraMenuFrame window = new CameraMenuFrame(selectedLabel, batteryLabel);
+    private MenuItem shutterItem;
+    private MenuItem gainItem;
+    private MenuItem timeBetweenItem;
+    private MenuItem restoreDefaultsItem;
+    private MenuItem[] settings;
+    private Font labelFont;
+    private SelectedLabel selectedLabel;
+    private BatteryLabel batteryLabel;
+    private CameraMenuFrame window;
 
     public CameraMenu(MasterController masterController) {
         this.masterController = masterController;
+
+        ValueWithIndex shutterTime = masterController.cameraController.getShutterTime();
+        ValueWithIndex gain = masterController.cameraController.getGain();
+        ValueWithIndex timeBetween = masterController.cameraController.getTlTimeBetween();
+
+        shutterItem = new MenuItemSetting("Shutter",shutterTime);
+        gainItem = new MenuItemSetting("Gain",  gain, "db");
+        timeBetweenItem = new MenuItemSetting("TL time", timeBetween);
+        restoreDefaultsItem = new MenuItem("Restore defaults", (e -> {
+            Arrays.stream(masterController.cameraController.getSettings()).forEach(ValueWithIndex::restoreDefault);
+            return null;
+        }));
+        settings = new MenuItem[]{toggleMenuItem, shutdownItem, rebootItem, maximizeItem,
+                killCamItem, showLastImage, timeBetweenItem, shutterItem, gainItem, restoreDefaultsItem};
+        labelFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 20);
+        selectedLabel = new SelectedLabel(settings[currentItem].getName().apply(null), labelFont);
+        batteryLabel = new BatteryLabel(masterController.batteryController.buildBatteryLabelString(), labelFont);
+        window = new CameraMenuFrame(selectedLabel, batteryLabel);
     }
 
     private Void toggleMenuAction() {

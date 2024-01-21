@@ -1,7 +1,6 @@
 package ventures.of.util;
 
 public class CameraVideoStringBuilder extends CameraStringBuilder{
-    private final StringBuilder command = new StringBuilder();
 
     private CameraVideoStringBuilder() {
         super("libcamera-vid");
@@ -23,10 +22,25 @@ public class CameraVideoStringBuilder extends CameraStringBuilder{
         command.append(" --level ").append(var);
         return this;
     }
-    public CameraVideoStringBuilder h264TargetLevel4() {
-        command.append(" --level 4");
+
+    public CameraVideoStringBuilder codec(String var) {
+        command.append(" --codec ").append(var);
         return this;
     }
 
+    public CameraVideoStringBuilder profile(String var) {
+        command.append(" --profile ").append(var);
+        return this;
+    }
+
+    public CameraVideoStringBuilder mode(String var) {
+        command.append(" --mode ").append(var);
+        return this;
+    }
+
+    public CameraVideoStringBuilder h264TargetLevel4() {
+        h264TargetLevel(4.0);
+        return this;
+    }
 
 }
