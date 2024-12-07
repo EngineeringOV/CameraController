@@ -21,7 +21,7 @@ public class CameraStringBuilder {
     public static CameraStringBuilder builder(String initialCommand) {
         return new CameraStringBuilder(initialCommand);
     }
-
+//todo bulk set settings with passing CameraSettings instance
     public CameraStringBuilder outputDirNoName(String var) {
         File asFile = new File(var);
         asFile.mkdirs();

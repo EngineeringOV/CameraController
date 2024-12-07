@@ -13,7 +13,8 @@ import static ventures.of.util.StringUtil.printVerbose;
 public class DisplayController {
     private int backlight = 80;
     private int backlightChange = 80;
-    boolean buttonVerbose = EnvironmentVariableUtil.getPropertyBool("camera.settings.log.verbose.buttons");
+    private boolean buttonVerbose = EnvironmentVariableUtil.getPropertyBool("camera.settings.log.verbose.buttons");
+    private final String  buttonsFrom = EnvironmentVariableUtil.getPropertyString("camera.hardware.buttons.from");
 
     private GpioController gpio;
     private GpioPinDigitalInput click, button1, button2, button3, up, down, left, right;
@@ -22,6 +23,9 @@ public class DisplayController {
 
     public DisplayController(MasterController masterController) {
         this.masterController = masterController;
+        //todo hi-prio put this somewhere nicer
+        if ("WAVESHARE_1.3INCH_LCD".equalsIgnoreCase(buttonsFrom)) {
+
         gpio = GpioFactory.getInstance();
         click = gpio.provisionDigitalInputPin(RaspiBcmPin.GPIO_23, PinPullResistance.PULL_UP);
         button1 = gpio.provisionDigitalInputPin(RaspiBcmPin.GPIO_29, PinPullResistance.PULL_UP);
@@ -33,7 +37,6 @@ public class DisplayController {
         right = gpio.provisionDigitalInputPin(RaspiBcmPin.GPIO_25, PinPullResistance.PULL_UP);
 
         runCommand("sudo pigpiod", false);
-
         //BUTTON1
         PinListenerImpl b1Listener = new PinListenerImpl("button1", buttonVerbose, button1);
         b1Listener.setReleasedFunction(e -> masterController.cameraController.triggerVideo());
@@ -67,6 +70,7 @@ public class DisplayController {
         clickListener.setReleasedFunction(e -> masterController.cameraMenu.menuTriggerCurrentAction());
 
         updateBacklightCliAction(backlightChange);
+    }
     }
 
     public Void updateBacklightCliAction(int change) {

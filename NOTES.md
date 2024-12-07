@@ -19,7 +19,7 @@ alias resetcc='sudo systemctl stop cameracontroller.service && sudo systemctl da
 
 # CASE
 
-- unscrew mount screws and attatch front, then rotate the mount before putting it back on.
+- unscrew mount screws and attach front, then rotate the mount before putting it back on.
 
 
 
@@ -31,8 +31,10 @@ alias resetcc='sudo systemctl stop cameracontroller.service && sudo systemctl da
 # Recurring bugs
 ## Solved
 ### Screen not starting
-- Reason 1: ``Advanced Settings -> Legacy Drivers`` have to be enabled in ``sudo Raspi-Config``
+- Reason 1: ``sudo Raspi-Config -> Advanced Settings -> GL Driver -> Legacy Drivers`` have to be enabled in 
 ### Wifi dying randomly
 - Reason 1: Overheating
 - Solution: Underclock (TODO writeup)
 https://raspberrypi.stackexchange.com/questions/27475/wifi-disconnects-after-period-of-time-on-raspberry-pi-doesnt-reconnect
+- Underpowered
+- dhcp refresh timer to long

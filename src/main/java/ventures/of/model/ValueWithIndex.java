@@ -8,6 +8,7 @@ import ventures.of.util.MathUtil;
 
 import java.util.Arrays;
 
+//todo figure out if it's better to have this be a string but allow numbers in and then transform that to strings
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,5 +41,29 @@ public class ValueWithIndex {
         return null;
     }
 
+    public String toJson() {
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"index\":").append(index).append(", ");
+        json.append("\"values\":[");
+
+        for (int i = 0; i < values.length; i++) {
+            json.append(values[i].toString());
+            if (i < values.length - 1) {
+                json.append(", ");
+            }
+        }
+
+        json.append("]}");
+        return json.toString();
+    }
+
+    public long asLong() {
+        return getActualValue().longValue();
+    }
+
+    public double asDouble() {
+        return getActualValue().doubleValue();
+    }
 }
 

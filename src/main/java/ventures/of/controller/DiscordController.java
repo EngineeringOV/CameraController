@@ -11,21 +11,25 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
+import ventures.of.model.CameraEnvironment;
 import ventures.of.util.EnvironmentVariableUtil;
+import ventures.of.util.StringUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 
-//todo set settings through discord
-//todo desktop screenshot
+//todo bulk set settings through discord
+
 @Slf4j
 public class DiscordController extends ListenerAdapter {
+    private final String IMAGES_DIR = EnvironmentVariableUtil.getPropertyString("camera.settings.function.image.dir");
+
     private final MasterController masterController;
-    public DiscordController(MasterController masterController) {
+    public DiscordController(MasterController masterController, String token) {
         this.masterController = masterController;
-        JDABuilder.createDefault(EnvironmentVariableUtil.getPropertyString("discord.api.token"))
+        JDABuilder.createDefault(token)
                 .addEventListeners(this)
                 .setActivity(Activity.playing("Commands = !help"))
                 .build();
@@ -44,32 +48,44 @@ public class DiscordController extends ListenerAdapter {
             if (/*!event.isFromType(ChannelType.TEXT) &&*/ !event.isFromType(ChannelType.PRIVATE)) {
                 return;
             }
-            if (event.getAuthor().isBot() /* && event.getAuthor().getName().equals() */) {
+            else if (event.getAuthor().isBot() /* && event.getAuthor().getName().equals() */) {
                 return;
             }
+
+
+            String userId = event.getAuthor().getId();
+
             PrivateChannel privateChannel = message.getChannel().asPrivateChannel();
             String messageContent = event.getMessage().getContentRaw();
             privateChannel.sendMessage("Message received, processing").queue();
             if (messageContent.equalsIgnoreCase("!help")) {
-                String str = "Here is the current commands\n" + "!killCam / kc\n" +
+                String str = userId+"! Here is the current commands\n" + "!killCam / kc\n" +
                         "!settings\n" +
                         "!snap / s\n" +
                         "!timelapse / tl\n" +
                         "!video / v\n" +
-                        "!latestImg / l\n";
+                        "!left / v\n" +
+                        "!right / v\n" +
+                        "!current / v\n" +
+                        "!action / v\n" +
+                        "!latestImg / l\n"+
+                        "!left / dl\n"+
+                        "!right / dr\n"+
+                        "!current  \n"+
+                        "!action / !click\n" +
+                        event.getAuthor().getEffectiveName() +"\n" +
+                        event.getAuthor().getName();
                 privateChannel.sendMessage(str).queue();
             }
-            if (messageContent.equalsIgnoreCase("!settings")) {
-
-                privateChannel.sendMessage("ShutterTime = " + masterController.cameraController.getShutterTime().getActualValue()).queue();
-                privateChannel.sendMessage("Gain = " + masterController.cameraController.getGain().getActualValue()).queue();
-                privateChannel.sendMessage("Time between images (tl) = " + masterController.cameraController.getTlTimeBetween().getActualValue()).queue();
+            else if (messageContent.equalsIgnoreCase("!settings")) {
+                privateChannel.sendMessage( masterController.cameraController.getCs().toJson());
             }
-            if (messageContent.equalsIgnoreCase("!killCam") || messageContent.equalsIgnoreCase("kc")) {
+
+            else if (messageContent.equalsIgnoreCase("!killCam") || messageContent.equalsIgnoreCase("kc")) {
                 CameraController.killLibCamera();
                 privateChannel.sendMessage("It's dead").queue();
             }
-            if (messageContent.equalsIgnoreCase("!snap") || messageContent.equalsIgnoreCase("s")) {
+            else if (messageContent.equalsIgnoreCase("!snap") || messageContent.equalsIgnoreCase("s")) {
                 masterController.cameraController.triggerTakeStill(8000,false);
                 privateChannel.sendMessage("SNAP!").queue();
                 try {
@@ -78,19 +94,30 @@ public class DiscordController extends ListenerAdapter {
                     e.printStackTrace();
                 }
             }
-            if (messageContent.equalsIgnoreCase("!timelapse") || messageContent.equalsIgnoreCase("tl")) {
+            else if (messageContent.equalsIgnoreCase("!timelapse") || messageContent.equalsIgnoreCase("tl")) {
                 CameraController.killLibCamera();
-                masterController.cameraController.triggerTimelapse();
                 privateChannel.sendMessage("Timelapse is going!").queue();
+                masterController.cameraController.triggerTimelapse();
             }
-            if (messageContent.equalsIgnoreCase("!video") || messageContent.equalsIgnoreCase("v")) {
+            else if (messageContent.equalsIgnoreCase("!video") || messageContent.equalsIgnoreCase("v")) {
                 CameraController.killLibCamera();
-                masterController.cameraController.triggerVideo();
                 privateChannel.sendMessage("Video is going!").queue();
+                masterController.cameraController.triggerVideo();
             }
-            if (messageContent.equalsIgnoreCase("!latestImg") || messageContent.equalsIgnoreCase("l")
-                    || messageContent.equalsIgnoreCase("!snap") || messageContent.equalsIgnoreCase("s")) {
-                File image = new File(CameraController.getLATEST_FILE());
+            else if (messageContent.equalsIgnoreCase("!screenshot") || messageContent.equalsIgnoreCase("ss")) {
+                InputStream inputStream;
+                try {
+                    File image = new File(screenshot());
+                    inputStream = new FileInputStream(image);
+                    FileUpload fileUpload = FileUpload.fromData(inputStream, "screenshot.png");
+                    privateChannel.sendFiles(fileUpload).queue();
+                } catch (IOException | AWTException e) {
+                    privateChannel.sendMessage("No screenshot file right now!").queue();
+                    e.printStackTrace();
+                }
+            }
+            else if (messageContent.equalsIgnoreCase("!latestImg") || messageContent.equalsIgnoreCase("l")) {
+                File image = new File(CameraEnvironment.getLATEST_FILE());
                 InputStream inputStream;
                 try {
                     inputStream = new FileInputStream(image);
@@ -101,7 +128,29 @@ public class DiscordController extends ListenerAdapter {
                     e.printStackTrace();
                 }
             }
+            else if(messageContent.equalsIgnoreCase("!left") || messageContent.equalsIgnoreCase(("dl"))) {
+                masterController.cameraMenu.menuMoveAction(-1);
+                privateChannel.sendMessage(masterController.cameraMenu.getCurrentMainItem().getName().apply(null)).queue();
+            }
+            else if(messageContent.equalsIgnoreCase("!right") || messageContent.equalsIgnoreCase(("dr"))) {
+                masterController.cameraMenu.menuMoveAction(1);
+                privateChannel.sendMessage(masterController.cameraMenu.getCurrentMainItem().getName().apply(null)).queue();
+            }
+            else if(messageContent.equalsIgnoreCase("!current") ) {
+                privateChannel.sendMessage(masterController.cameraMenu.getCurrentMainItem().getName().apply(null)).queue();
+            }
+            else if(messageContent.equalsIgnoreCase("!action") || messageContent.equalsIgnoreCase(("!click"))) {
+                masterController.cameraMenu.menuTriggerCurrentAction();
+                privateChannel.sendMessage(masterController.cameraMenu.getCurrentMainItem().getName().apply(null)).queue();
+            }
             privateChannel.sendMessage("Message processed").queue();
         }).start();
+    }
+
+    private String screenshot() throws IOException, AWTException {
+        String name = StringUtil.getCurrentTime();
+        BufferedImage bufferedImage = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+        ImageIO.write(bufferedImage, "png", new File(IMAGES_DIR+"/ss"+ name+".png"));
+        return IMAGES_DIR+"/ss"+ name+".png";
     }
 }

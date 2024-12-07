@@ -129,6 +129,20 @@ public class ProcessUtil {
         runCommand("sudo sh -c \"echo 1 > /sys/class/leds/default-on/brightness\"");
     }
 
+    public static Void restartWifi() {
+        runCommand("/bin/sh -c nohup sudo ifdown wlan0 &");
+        runCommand("/bin/sh -c nohup sudo ifup wlan0 &");
+        return null;
+    }
+
+    public static void disableWifi() {
+        runCommand("/bin/sh -c nohup sudo ifdown wlan0 &");
+    }
+
+    public static void enableWifi() {
+        runCommand("/bin/sh -c nohup sudo ifup wlan0 &");
+    }
+
     public static void killProcesses(String... toKill) {
         processes.stream()
                 .filter(e -> Arrays.stream(toKill).anyMatch(k -> k.equals(e.program)))

@@ -7,66 +7,99 @@ import ventures.of.controller.CameraController;
 import ventures.of.controller.MasterController;
 import ventures.of.model.ValueWithIndex;
 import ventures.of.util.*;
+import ventures.of.view.menu.item.DirectMenuItem;
+import ventures.of.view.menu.item.MenuItemSetting;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 import static ventures.of.util.StringUtil.printVerbose;
 
-//todo super menuItems which contain others, so maybe one for settings etc
-//todo temperature item
+//todo Hi-prio super menuItems which contain others, so maybe one for settings etc
 @Data
 @NoArgsConstructor
 public class CameraMenu {
+    private final Boolean touchEnabled = EnvironmentVariableUtil.getPropertyBool("camera.hardware.display.touch");
+
     private MasterController masterController;
     private Color invisibleColor = new Color(0, 0, 0, 0);
     private boolean menuShown = true;
     private int currentItem = 0;
 
-    private MenuItem toggleMenuItem = new MenuItem("Menu", (e -> toggleMenuAction()));
-    private MenuItem rebootItem = new MenuItem("Reboot", (e -> ProcessUtil.rebootAction()));
-    private MenuItem shutdownItem = new MenuItem("Shutdown", (e -> ProcessUtil.shutdownAction()));
-    private MenuItem killCamItem = new MenuItem("Kill cam", (e -> CameraController.killLibCamera()));
-    private MenuItem maximizeItem = new MenuItem("Maximize", (e -> RobotUtil.maximizeWindow(0)));
-    //todo show only if latest.jpg exists
-    private MenuItem showLastImage = new MenuItem("Last image", (e -> showImageZoomAction(3, 3, 1, 1, "latest.jpg")), (f -> ImageViewerView.destroyFrames()));
-    //private MenuItem toggleWifi = new MenuItem("Last image", (e -> showImageZoomAction(3,3, 1, 1, "latest.jpg")), (f -> ImageViewerView.destroyFrames()));
+    //todo sub "SYSTEM" menu
+    private DirectMenuItem rebootItem = new DirectMenuItem("Reboot", (e -> ProcessUtil.rebootAction()));
+    private DirectMenuItem shutdownItem = new DirectMenuItem("Shutdown", (e -> ProcessUtil.shutdownAction()));
+    private DirectMenuItem killCamItem = new DirectMenuItem("Kill cam", (e -> CameraController.killLibCamera()));
+   // private DirectMenuItem toggleWifi = new DirectMenuItem("Restart Wifi", (e -> ProcessUtil.restartWifi()));
     //private MenuItem toggleBlueTooth = new MenuItem("Last image", (e -> showImageZoomAction(3,3, 1, 1, "latest.jpg")), (f -> ImageViewerView.destroyFrames()));
+
+    //todo sub "OTHER" menu
+    private DirectMenuItem toggleMenuItem = new DirectMenuItem("Menu", (e -> toggleMenuAction()));
+    private DirectMenuItem maximizeItem = new DirectMenuItem("Maximize", (e -> RobotUtil.maximizeWindow(0)));
+    //todo show only if latest.jpg exists
+    private DirectMenuItem showLastImage = new DirectMenuItem("Last image", (e -> showImageZoomAction(3, 3, 1, 1, "latest.jpg")), (f -> ImageViewerView.destroyFrames()));
+
+    // private MenuItem backlightItem = new MenuItem("Backlight", null);
+    //todo sub "PHOTO"
+    private DirectMenuItem shutterItem;
+    private DirectMenuItem gainItem;
+    private DirectMenuItem contrastItem;
+    private DirectMenuItem timeBetweenItem;
+    private DirectMenuItem restoreDefaultsItem;
     //private MenuItem showLastImage = new MenuItem("Saturation", (e -> cameraController.killLibCamera()));
     //private MenuItem showLastImage = new MenuItem("Sharpness", (e -> cameraController.killLibCamera()));
-    //private MenuItem showLastImage = new MenuItem("Contrast", (e -> cameraController.killLibCamera()));
-    // private MenuItem backlightItem = new MenuItem("Backlight", null);
-    private MenuItem shutterItem;
-    private MenuItem gainItem;
-    private MenuItem timeBetweenItem;
-    private MenuItem restoreDefaultsItem;
-    private MenuItem[] settings;
+
+    //Touch controls
+    private DirectMenuItem startVideo = new DirectMenuItem("Start video", (e -> masterController.cameraController.triggerVideo()));
+    private DirectMenuItem startTimelapse = new DirectMenuItem("Start timelapse", (e -> masterController.cameraController.triggerTimelapse()));
+    private DirectMenuItem startSnapshot = new DirectMenuItem("Start snapshot", (e -> masterController.cameraController.triggerTakeStill()));
+
+    // MENU free items
+    private DirectMenuItem[] settings;
     private Font labelFont;
     private SelectedLabel selectedLabel;
-    private BatteryLabel batteryLabel;
+    private BatteryLabel infoLabel;
     private CameraMenuFrame window;
 
     public CameraMenu(MasterController masterController) {
         this.masterController = masterController;
 
-        ValueWithIndex shutterTime = masterController.cameraController.getShutterTime();
-        ValueWithIndex gain = masterController.cameraController.getGain();
-        ValueWithIndex timeBetween = masterController.cameraController.getTlTimeBetween();
+        ValueWithIndex shutterTime = masterController.cameraController.getCs().getShutterTime();
+        ValueWithIndex gain = masterController.cameraController.getCs().getGain();
+        ValueWithIndex timeBetween = masterController.cameraController.getCs().getTlTimeBetween();
+        ValueWithIndex contrast = masterController.cameraController.getCs().getContrast();
 
         shutterItem = new MenuItemSetting("Shutter",shutterTime);
         gainItem = new MenuItemSetting("Gain",  gain, "db");
+        contrastItem = new MenuItemSetting("Contrast",  contrast, "");
         timeBetweenItem = new MenuItemSetting("TL time", timeBetween);
-        restoreDefaultsItem = new MenuItem("Restore defaults", (e -> {
-            Arrays.stream(masterController.cameraController.getSettings()).forEach(ValueWithIndex::restoreDefault);
+        restoreDefaultsItem = new DirectMenuItem("Restore defaults", (e -> {
+            Arrays.stream(masterController.cameraController.getCs().getSettings()).forEach(ValueWithIndex::restoreDefault);
             return null;
         }));
-        settings = new MenuItem[]{toggleMenuItem, shutdownItem, rebootItem, maximizeItem,
-                killCamItem, showLastImage, timeBetweenItem, shutterItem, gainItem, restoreDefaultsItem};
+
+        if(touchEnabled) {
+            settings = new DirectMenuItem[]{toggleMenuItem, shutdownItem, rebootItem, maximizeItem, killCamItem,
+                    /*toggleWifi,*/ showLastImage, timeBetweenItem, shutterItem, gainItem,
+                    contrastItem, restoreDefaultsItem, startVideo, startTimelapse, startSnapshot};
+        }
+        else {
+            settings = new DirectMenuItem[]{toggleMenuItem, shutdownItem, rebootItem, maximizeItem, killCamItem,
+                    /*toggleWifi,*/ showLastImage, timeBetweenItem, shutterItem, gainItem,
+                    contrastItem, restoreDefaultsItem};
+        }
         labelFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 20);
         selectedLabel = new SelectedLabel(settings[currentItem].getName().apply(null), labelFont);
-        batteryLabel = new BatteryLabel(masterController.batteryController.buildBatteryLabelString(), labelFont);
-        window = new CameraMenuFrame(selectedLabel, batteryLabel);
+        infoLabel = new BatteryLabel(masterController.batteryController.buildInfoText(), labelFont);
+        window = new CameraMenuFrame(selectedLabel, infoLabel);
+        selectedLabel.addMouseListener( new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                menuTriggerCurrentAction();
+            }
+        });
     }
 
     private Void toggleMenuAction() {
@@ -119,7 +152,7 @@ public class CameraMenu {
         return null;
     }
 
-    private MenuItem getCurrentMainItem() {
+    public DirectMenuItem getCurrentMainItem() {
         return settings[currentItem];
     }
 

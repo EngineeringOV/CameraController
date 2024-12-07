@@ -8,7 +8,6 @@ public class CameraTimelapseStringBuilder extends CameraStringBuilder {
 
     public String build() {
         command.append(" --qt-preview");
-
         return command.toString();
     }
 
