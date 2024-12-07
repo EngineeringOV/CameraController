@@ -33,6 +33,7 @@ public class MainProgram {
     static {
         try {
             EnvironmentVariableUtil.readerFromConfigWithFallback(properties);
+            properties.list(System.out);
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }

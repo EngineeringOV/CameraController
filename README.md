@@ -46,7 +46,7 @@ cd CameraController
 sudo cp ./src/main/resources/cameracontroller.service /etc/systemd/system/cameracontroller.service
 sudo cp ./src/main/resources/default.config.properties ~/projects/config.properties
 sudo bash gradlew jar
-sudo cp ./build/libs/cameracontroller-1.jar ~/projects/cameracontroller-1.jar
+sudo cp ./build/libs/cameraController-1.jar ~/projects/cameraController-1.jar
 sudo systemctl enable cameracontroller.service
 sudo systemctl start cameracontroller.service
 #sudo journalctl -u cameracontroller.service -f

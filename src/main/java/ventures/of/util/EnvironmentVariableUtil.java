@@ -39,7 +39,7 @@ public class EnvironmentVariableUtil {
     }
 
     public static String getPropertyString(String key) {
-        return MainProgram.properties.getProperty(key).toUpperCase(Locale.ROOT);
+        return MainProgram.properties.getProperty(key).toUpperCase(Locale.ROOT).trim();
     }
 
     public static List<String> getPropertyStringArrayList(String key) {

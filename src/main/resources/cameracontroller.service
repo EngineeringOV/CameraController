@@ -5,7 +5,7 @@ After=multi-user.target
 [Service]
 User=pi-camera
 WorkingDirectory=/home/pi-camera/projects
-ExecStart=/usr/bin/java -jar cameraController-1.jar
+ExecStart="/usr/bin/java -jar cameraController-1.jar"
 SuccessExitStatus=143
 Restart=always
 RestartSec=5

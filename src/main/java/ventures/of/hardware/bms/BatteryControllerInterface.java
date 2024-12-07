@@ -82,7 +82,7 @@ public class BatteryControllerInterface implements InfoText {
     }
 
     public static BatteryControllerInterface getBMSType(MasterController masterController, String batteryFrom) throws IOException, I2CFactory.UnsupportedBusNumberException {
-        switch (batteryFrom){
+        switch (batteryFrom.toUpperCase()){
             case("WAVESHARE_3S_5A"):
                 return new BatteryControllerWaveshare3S5AUPS(masterController);
             case("WAVESHARE_ZERO_UPS"):
@@ -90,7 +90,7 @@ public class BatteryControllerInterface implements InfoText {
             case("NONE"):
                 return null;
             default:
-                throw new IllegalStateException("Invalid BMS type (camera.hardware.battery.from)");
+                throw new IllegalStateException("Invalid BMS type (camera.hardware.battery.from): "+ batteryFrom);
         }
 
     }
