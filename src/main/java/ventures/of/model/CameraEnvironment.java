@@ -6,7 +6,6 @@ import ventures.of.util.JsonBuilder;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
 public class CameraEnvironment {
     @Getter

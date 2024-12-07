@@ -8,7 +8,6 @@ import java.util.function.Function;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class MenuItemInterface {
 public void onClick() {
 
