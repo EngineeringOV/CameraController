@@ -22,7 +22,7 @@ public class CameraMenuFrame extends Frame {
             this.add(selectedLabel);
             this.add(infoLabel);
             //this.add(test);
-            //this.pack();
+            this.pack();
             this.setLocation(10, 215);
             this.setVisible(true);
         }
