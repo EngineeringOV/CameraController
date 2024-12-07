@@ -15,7 +15,7 @@ public class EnvironmentVariableUtil {
 
     public static void readerFromConfigWithFallback(Properties properties) throws URISyntaxException, IOException {
         String configPath = new File(FileUtil.class.getProtectionDomain().getCodeSource().getLocation()
-                .toURI()).getPath() + "/config.properties";
+                .toURI()).getParent() + "/config.properties";
         File configFile = new File(configPath);
         BufferedReader reader =  readerFileFromJar("default.config.properties");
         properties.load(reader);
