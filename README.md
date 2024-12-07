@@ -166,6 +166,14 @@ Arducam 64MP
 ```bash
 todo fix
 ```
+## Updating
+```bash
+cd ~/Downloads/CameraController
+git pull
+sudo bash gradlew jar
+sudo cp ./build/libs/cameraController-1.jar ~/projects/cameraController-1.jar
+sudo systemctl stop cameracontroller.service && sudo systemctl daemon-reload && sudo systemctl start cameracontroller.service && sudo journalctl -u cameracontroller.service -f
+```
 
 ## (Optional development example code) UPS HAT
 ```shell

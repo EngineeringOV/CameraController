@@ -42,7 +42,7 @@ public class MainProgram {
     private final static List<String> infoText = EnvironmentVariableUtil.getPropertyStringArrayList("camera.settings.infoText.options");
     private final static long infoTextTimer = EnvironmentVariableUtil.getPropertyLong("camera.settings.infoText.timer");
 
-    public static void main(String[] args) throws InterruptedException, IOException, I2CFactory.UnsupportedBusNumberException {
+    public static void main(String[] args) throws IOException, I2CFactory.UnsupportedBusNumberException {
         boolean updateBattery = true;
         long startTime = System.currentTimeMillis();
         printVerbose("Starting camera controller", true);
