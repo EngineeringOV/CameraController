@@ -46,7 +46,7 @@ public class EnvironmentVariableUtil {
         String valueAsClumpString = MainProgram.properties.getProperty(key).toUpperCase(Locale.ROOT);
         if(valueAsClumpString.startsWith("[") && valueAsClumpString.endsWith("]")) {
             valueAsClumpString = valueAsClumpString.substring(1, valueAsClumpString.length()-1);
-            return Arrays.stream((valueAsClumpString.split(","))).map(String::trim).collect(Collectors.toList());
+            return Arrays.stream((valueAsClumpString.split(","))).map(String::toUpperCase).map(String::trim).collect(Collectors.toList());
         }
         else {
             return Collections.singletonList(valueAsClumpString);
