@@ -60,15 +60,15 @@ public class MainProgram {
         int infoLabelDisplayIndex = 0;
         while (true) {
             String currentLabel = infoText.get(infoLabelDisplayIndex).toLowerCase();
-
+            System.out.println("currentLabel = " + currentLabel);
             // Update the info label based on the current label type
             switch (currentLabel) {
-                case "battery":
+                case "BATTERY":
                     masterController.cameraMenu.getInfoLabel().setText(
                             masterController.batteryController.updateInfoText()
                     );
                     break;
-                case "temperature":
+                case "TEMPERATURE":
                     masterController.cameraMenu.getInfoLabel().setText(
                             masterController.tempController.updateInfoText()
                     );
