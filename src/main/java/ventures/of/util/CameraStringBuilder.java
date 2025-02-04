@@ -195,4 +195,14 @@ public class CameraStringBuilder {
         return this;
     }
 
+    public CameraStringBuilder findAppropriateResolution() {
+        String model = EnvironmentVariableUtil.getPropertyString("camera.hardware.rpi.model");
+        if("02".equals(model)) {
+            width(4640);
+            height(3480);
+        }
+        // else nothing which defaults to camera max
+
+        return this;
+    }
 }

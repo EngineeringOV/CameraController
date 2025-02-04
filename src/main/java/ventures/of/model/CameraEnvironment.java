@@ -7,6 +7,7 @@ import ventures.of.util.JsonBuilder;
 @Data
 @NoArgsConstructor
 @ToString
+//TODO MAKE these hotswappable
 public class CameraEnvironment {
     @Getter
     private static final String LATEST_FILE = EnvironmentVariableUtil.getPropertyString("camera.settings.function.lastimage.dir");

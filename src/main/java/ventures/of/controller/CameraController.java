@@ -23,6 +23,8 @@ public class CameraController {
     private CameraEnvironment ce = new CameraEnvironment();
     private CameraSettings cs = new CameraSettings();
 
+    private final int tempZero2WindowAppearTimer = 8000;
+
     //video NYI
     private String buildVideoString() {
         return CameraVideoStringBuilder
@@ -30,11 +32,11 @@ public class CameraController {
                 .framerate(cs.getFramerate().asDouble())
                 //.codec("libav")
                 .codec("h264")
-                .profile("high")
-                .mode("640:480:30")
-                .h264TargetLevel(4.1)
-                .width(640)
-                .height(480)
+       //         .profile("high")
+       //         .mode("640:480:30")
+       //        .h264TargetLevel(4.1)
+       //        .width(640)
+       //        .height(480)
                 .sharpness(cs.getSharpness().asDouble())
                 .contrast(cs.getContrast().asDouble())
                 //.noPreview()
@@ -42,6 +44,7 @@ public class CameraController {
                 .outputDirAndName(ce.getVIDEO_DIR() + StringUtil.getCurrentTime() + ".h264")
                 .denoise("cdn_off")
                 .verbose(ce.getVerboseCamera())
+                .findAppropriateResolution()
                 .build();
     }
 
@@ -60,6 +63,7 @@ public class CameraController {
                 .quality(100)
                 .verbose(ce.getVerboseCamera())
                 .latest(CameraEnvironment.getLATEST_FILE())
+                .findAppropriateResolution()
                 .build();
     }
 
@@ -78,6 +82,7 @@ public class CameraController {
                 .quality(100)
                 .verbose(ce.getVerboseCamera())
                 .latest(CameraEnvironment.getLATEST_FILE())
+                .findAppropriateResolution()
                 .build();
     }
 
@@ -92,7 +97,7 @@ public class CameraController {
         if (cameraStatus.equals(CameraStates.READY)) {
             cameraStatus = CameraStates.NOT_READY_VIDEO;
             ledBlinking();
-            maximizeWindow(8000);
+            maximizeWindow(tempZero2WindowAppearTimer);
             runCommand(buildVideoString(), true, true);
             cameraStatus = CameraStates.READY;
             ledContinuous();
@@ -105,14 +110,14 @@ public class CameraController {
             cameraStatus = CameraStates.NOT_READY_TIMELAPSE;
             FileUtil.writeToFile(ce.getTIMELAPSE_DIR()+"settings.json", cs.toJson());
             ledBlinking();
-            maximizeWindow(8000);
+            maximizeWindow(tempZero2WindowAppearTimer);
             String tlCommand = buildTimelapseString();
             int exitCode = runCommand(tlCommand, true, true).exitValue();
             int retries = 0;
             while (/*retries < 10000 &&*/ cameraStatus.equals(CameraStates.NOT_READY_TIMELAPSE) && exitCode != 0) {
                 try {
                     log.error("Attempt " + retries + " to restart timelapse");
-                    maximizeWindow(8000);
+                    maximizeWindow(tempZero2WindowAppearTimer);
                     exitCode = runCommand(tlCommand, true, true).exitValue();
                     retries++;
                     Thread.sleep(3000);
@@ -127,7 +132,7 @@ public class CameraController {
     }
 
     public Void triggerTakeStill() {
-        return triggerTakeStill(8000, true);
+        return triggerTakeStill(tempZero2WindowAppearTimer, true);
     }
 
     public Void triggerTakeStill(int maximizeTime, boolean wait) {

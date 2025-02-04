@@ -10,7 +10,10 @@
 
   ```
   Reccomended
+  Autofocus is good for the small screen
+  but as of RPI0-2 There's not enough RAM for more than 16MP
   [Arducam 64MP Camera module]
+  [m2 screws and bolt]
   ```
  __or__
   ```
@@ -52,14 +55,18 @@ sudo systemctl start cameracontroller.service
 #sudo journalctl -u cameracontroller.service -f
 sudo nano ~/projects/config.properties
 
-sudo reboot
 ```
-- #### Setup environment, optional but not really 
+
+- #### Setup Raspberry Pi
 ````bash
-sudo apt install guake cmake p7zip-full zsh -y
+#Some  nice to have tools
+sudo apt install guake  p7zip-full zsh -y
+# Oh my Zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
 # disable services that are slow to boot and use a lot of power
-systemctl disable ModemManager.service
-systemctl disable hciuart.service
+sudo systemctl disable ModemManager.service
+sudo systemctl disable hciuart.service
 
 # Enable I2C and SPI
 sudo bash -c 'echo -e "dtparam=i2c_arm=on\ndtparam=spi=on" >> /boot/config.txt'
@@ -68,29 +75,80 @@ sudo sed -i "s/autohide=.*/autohide=1/" /etc/xdg/lxpanel/LXDE-pi/panels/panel
 
 # Set swap size 
 sudo dphys-swapfile swapoff
-echo "CONF_SWAPSIZE=1024" > /etc/dphys-swapfile
+sudo bash -c 'echo "CONF_SWAPSIZE=2048" > /etc/dphys-swapfile'
 sudo dphys-swapfile setup
 sudo dphys-swapfile swapon
 
 # Effectivised CMDline
 sudo sed -i -e 's/\bconsole=tty[0-9]\+/console=tty3/' \
-            -e '/rootwait/!b;s/\brootwait\b/& quiet loglevel=3 quiet logo.nologo nosplash cma=375M/' \
+            -e '/rootwait/!b;s/\brootwait\b/& quiet loglevel=3 logo.nologo nosplash cma=375M/' \
             -e 's/quiet[^ ]*//g;s/loglevel=[^ ]*//g;s/logo\.nologo//g;s/nosplash//g;s/cma=[^ ]*//g' \
-            -e '/rootwait/s/$/ quiet loglevel=3 quiet logo.nologo nosplash cma=375M/' /boot/cmdline.txt
+            -e '/rootwait/s/$/ quiet loglevel=3 logo.nologo nosplash cma=375M/' /boot/cmdline.txt
 
 
-#todo disable wifi power savings mode
-#todo install oh my zsh
-# todo split up and automate config.txt additions
+# Set config.txt fields if they exist otherwise add them
+CONFIG_FILE="/boot/config.txt"
+sudo bash -c '
+declare -A settings=(
+    [disable_splash]="1"
+    [boot_delay]="0"
+    ["#arm_freq"]="600"
+    ["#gpu_freq"]="300"
+    ["#sdram_freq"]="400"
+)
+CONFIG_FILE="${CONFIG_FILE:-/boot/config.txt}"
+for key in "${!settings[@]}"; do
+    value="${settings[$key]}"
+    if grep -q "^${key}=" "$CONFIG_FILE"; then
+        sed -i "s|^${key}=.*|${key}=${value}|" "$CONFIG_FILE"
+    else
+        echo "${key}=${value}" >> "$CONFIG_FILE"
+    fi
+done
+
+if ! grep -q "dtoverlay=disable-bt" "$CONFIG_FILE"; then
+echo "dtoverlay=disable-bt" >> "$CONFIG_FILE"
+fi
+'
+
+#todo disable wifi power savings mode ?
 ````
+### Next steps depend on camera module!
+<details>
+<summary>HQ Camera Module</summary>
 
-- install  display drivers (Instructions below) and ***Optional*** battery code examples 
 
-### If the camera starts correctly then you did everything correctly and you're now done
+```
+sudo bash -c '
+    if ! grep -q "dtoverlay=imx477,media-controller=0" /boot/config.txt; then
+        echo "dtoverlay=imx477,media-controller=0" >> /boot/config.txt
+    fi'
+```
+</details>
+<details>
+<summary>Arducam 64MP Hawkeye</summary>
 
-## 1.3 inch display drivers
+```
+sudo bash -c '
+    cd ~/Downloads/
+    wget -O install_pivariety_pkgs.sh https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/install_pivariety_pkgs.sh
+    chmod +x install_pivariety_pkgs.sh
+    ./install_pivariety_pkgs.sh -p libcamera_dev
+    ./install_pivariety_pkgs.sh -p libcamera_apps
 
-Raspi-config and enable SPI-config
+    if ! grep -q "dtoverlay=arducam-64mp" /boot/config.txt; then
+       echo "dtoverlay=arducam-64mp" >> /boot/config.txt
+    fi'
+```
+- Enable ```Glamor graphic acceleration``` by running```sudo raspi-config``` -> ```Advanced Options``` -> ```Enable Glamor graphic acceleration``` -> ```Yes```
+</details>
+
+- install  display drivers (Instructions below) and ***Optionally*** battery code examples 
+- ````sudo reboot````
+- ###### If the camera starts correctly then you did everything correctly and you're now done
+
+## 1.3 Inch Waveshare display drivers
+
 ````bash
 #Update and install required libs
 sudo apt install ttf-wqy-zenhei python3-pip cmake -y
@@ -129,51 +187,31 @@ sudo cp ~/Downloads/waveshare_fbcp/build/fbcp /usr/local/bin/fbcp
 if ! grep -q "fbcp&" /etc/rc.local; then
   sudo sed -i '/^exit 0$/s/^exit 0$/fbcp\&\n&/' /etc/rc.local
 fi
+
+# Set config.txt fields if they exist otherwise add them
+CONFIG_FILE="/boot/config.txt"
+sudo bash -c '
+declare -A settings=(
+    ["hdmi_force_hotplug"]="1"
+    ["hdmi_cvt"]="300 300 60 1 0 0 0"
+    ["hdmi_group"]="2"
+    ["hdmi_mode"]="87"
+    ["display_rotate"]="0"
+    ["gpu_mem"]="32"
+)
+CONFIG_FILE="${CONFIG_FILE:-/boot/config.txt.test}"
+for key in "${!settings[@]}"; do
+    value="${settings[$key]}"
+    if grep -q "^${key}=" "$CONFIG_FILE"; then
+        sed -i "s|^${key}=.*|${key}=${value}|" "$CONFIG_FILE"
+    else
+        echo "${key}=${value}" >> "$CONFIG_FILE"
+    fi
+done
+'
 ````
 
-## Setting up config
-
-- Do ````sudo nano /boot/config.txt```` And at the bottom add
-````bash
-# Speeds up boot
-disable_splash=1
-dtoverlay=disable-bt
-boot_delay=0
-
-# Sets display settings for our fancy display
-hdmi_force_hotplug=1
-hdmi_cvt=300 300 60 1 0 0 0
-hdmi_group=2
-hdmi_mode=87
-display_rotate=0
-
-# Makes sure the wifi doesn't crash as it can running with air cooling
-#arm_freq=600
-#gpu_freq=300
-#sdram_freq=400
-
-# Leaves enough RAM for camera as camera doesn't share with GPU_MEM.
-gpu_mem=32
-
-#Sets the right camera driver
-````
-
-HQ Camera Module
-```bash
-dtoverlay=imx477,media-controller=0
-```
-Arducam 64MP
-```bash
-todo fix
-```
-## Updating
-```bash
-cd ~/Downloads/CameraController
-git pull
-sudo bash gradlew jar
-sudo cp ./build/libs/cameraController-1.jar ~/projects/cameraController-1.jar
-sudo systemctl stop cameracontroller.service && sudo systemctl daemon-reload && sudo systemctl start cameracontroller.service && sudo journalctl -u cameracontroller.service -f
-```
+# Development
 
 ## (Optional development example code) UPS HAT
 ```shell
@@ -183,5 +221,14 @@ wget https://www.waveshare.com/w/upload/4/40/UPS_HAT_C.7z
 cd UPS_HAT_C
 # python3 INA219.py
 ```
+todo: make all code here idempotent
+todo: implement https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/64MP-Hawkeye/
+todo_ https://forum.arducam.com/t/how-to-use-arducam-64mp-arducam-64mp-faq/2848/2
 </details>
 
+# Aliases
+```bash
+alias brc='sudo nano ~/.zshrc && source ~/.zshrc'
+alias resetcc='sudo systemctl stop cameracontroller.service && sudo systemctl daemon-reload && sudo systemctl start cameracontroller.service && sudo journalctl -u cameracontroller.service -f'
+alias updateCC='cd ~/Downloads/CameraController && git pull && sudo bash gradlew jar && sudo cp ./build/libs/cameraController-1.jar ~/projects/cameraController-1.jar && sudo systemctl stop cameracontroller.service && sudo systemctl daemon-reload && sudo systemctl start cameracontroller.service && sudo journalctl -u cameracontroller.service -f'
+```

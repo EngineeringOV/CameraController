@@ -32,7 +32,7 @@ public class FileUtil {
         return new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(path)));
     }
 
-    public static BufferedReader readerFromFile(String path) throws FileNotFoundException, URISyntaxException {
+    public static BufferedReader readerFromFile(String path) throws FileNotFoundException {
         return new BufferedReader(new InputStreamReader(new FileInputStream(path)));
     }
 

@@ -43,4 +43,16 @@ public class CameraVideoStringBuilder extends CameraStringBuilder{
         return this;
     }
 
+    public CameraStringBuilder findAppropriateResolution() {
+        String model = EnvironmentVariableUtil.getPropertyString("camera.hardware.rpi.model");
+        if("02".equals(model)) {
+            width(4640);
+            height(3480);
+            h264TargetLevel(4.0);
+            mode("4640:3480:30");
+        }
+        // else nothing which defaults to camera max (I think)
+
+        return this;
+    }
 }

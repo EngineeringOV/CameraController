@@ -1,5 +1,3 @@
-
-
 ## feature ideas
 - delayed shots?
 - Pixel shifting feature
@@ -14,27 +12,39 @@ https://forums.raspberrypi.com//viewtopic.php?t=195692
 https://elinux.org/images/6/64/Chris-simmonds-boot-time-elce-2017_0.pdf
 
 
-# aliases
-alias resetcc='sudo systemctl stop cameracontroller.service && sudo systemctl daemon-reload && sudo systemctl start cameracontroller.service && sudo journalctl -u cameracontroller.service -f'
-
-# CASE
-
-- unscrew mount screws and attach front, then rotate the mount before putting it back on.
-
-
-
-
-
-
-
-
 # Recurring bugs
 ## Solved
-### Screen not starting
-- Reason 1: ``sudo Raspi-Config -> Advanced Settings -> GL Driver -> Legacy Drivers`` have to be enabled in 
-### Wifi dying randomly
-- Reason 1: Overheating
-- Solution: Underclock (TODO writeup)
-https://raspberrypi.stackexchange.com/questions/27475/wifi-disconnects-after-period-of-time-on-raspberry-pi-doesnt-reconnect
+#### Waveshare 1.4 inch Screen not starting
+- Wrong driver enabled
+  - ``sudo Raspi-Config `` -> ``Advanced Settings`` -> ``GL Driver`` -> ``Legacy Drivers`` -> ``Yes`` 
+  
+#### Wifi dying randomly
+- Overheating
+  - Underclock Raspberry Pi
+  - Fan mod
+  - Heatsink
 - Underpowered
-- dhcp refresh timer to long
+  - Get better UPS/BMS/power brick
+- DHCP leash timer to long
+  -  Set shorter DHCP leash time on router
+
+#### Camera not outputing image with error "``Camera frontend has timed out! [...] Device timeout detected``"
+- ``viewfinder-width`` / ``viewfinder-height`` set
+  - Remove from commandline (in this code remove from ``CameraStringBuilder.java`` builder)
+  
+#### Camera not outputing image with error "``ERROR: *** failed to allocate capture buffers ***``"
+
+- Lack of free RAM (CMA)
+  - Uninstall bloatware
+  - Use a RPI with more RAM
+  - Increase it in /boot/cmdline.txt
+  - Use page file
+  - Decrease image resolution
+
+#### Camera not outputing image with error "``ERROR: *** no cameras available ***``"
+- Broken camera cable
+  - Replace it
+- Camera was hotplugged
+  - Reboot
+
+
