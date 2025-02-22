@@ -10,10 +10,10 @@ import ventures.of.util.JsonBuilder;
 //TODO MAKE these hotswappable
 public class CameraEnvironment {
     @Getter
-    private static final String LATEST_FILE = EnvironmentVariableUtil.getPropertyString("camera.settings.function.lastimage.dir");
-    private final String VIDEO_DIR = EnvironmentVariableUtil.getPropertyString("camera.settings.function.video.dir");
-    private final String TIMELAPSE_DIR = EnvironmentVariableUtil.getPropertyString("camera.settings.function.timelapse.dir");
-    private final String IMAGES_DIR = EnvironmentVariableUtil.getPropertyString("camera.settings.function.image.dir");
+    private static final String LATEST_FILE = EnvironmentVariableUtil.getPropertyStringNoCaseModify("camera.settings.function.lastimage.dir");
+    private final String VIDEO_DIR = EnvironmentVariableUtil.getPropertyStringNoCaseModify("camera.settings.function.video.dir");
+    private final String TIMELAPSE_DIR = EnvironmentVariableUtil.getPropertyStringNoCaseModify("camera.settings.function.timelapse.dir");
+    private final String IMAGES_DIR = EnvironmentVariableUtil.getPropertyStringNoCaseModify("camera.settings.function.image.dir");
     private final int verboseCamera = EnvironmentVariableUtil.getPropertyInt("camera.settings.log.verbose.camera");
 
 

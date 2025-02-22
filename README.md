@@ -47,13 +47,13 @@ cd ~/Downloads/
 git clone https://github.com/EngineeringOV/CameraController.git
 cd CameraController
 sudo cp ./src/main/resources/cameracontroller.service /etc/systemd/system/cameracontroller.service
-sudo cp ./src/main/resources/default.config.properties ~/projects/config.properties
-sudo bash gradlew jar
-sudo cp ./build/libs/cameraController-1.jar ~/projects/cameraController-1.jar
+cp ./src/main/resources/default.config.properties ~/projects/config.properties
+bash gradlew jar
+cp ./build/libs/cameraController-1.jar ~/projects/cameraController-1.jar
 sudo systemctl enable cameracontroller.service
 sudo systemctl start cameracontroller.service
 #sudo journalctl -u cameracontroller.service -f
-sudo nano ~/projects/config.properties
+nano ~/projects/config.properties
 
 ```
 
@@ -83,7 +83,7 @@ sudo dphys-swapfile swapon
 sudo sed -i -e 's/\bconsole=tty[0-9]\+/console=tty3/' \
             -e '/rootwait/!b;s/\brootwait\b/& quiet loglevel=3 logo.nologo nosplash cma=375M/' \
             -e 's/quiet[^ ]*//g;s/loglevel=[^ ]*//g;s/logo\.nologo//g;s/nosplash//g;s/cma=[^ ]*//g' \
-            -e '/rootwait/s/$/ quiet loglevel=3 logo.nologo nosplash cma=375M/' /boot/cmdline.txt
+            -e '/rootwait/s/$/ quiet loglevel=3 logo.nologo nosplash cma=350M/' /boot/cmdline.txt
 
 
 # Set config.txt fields if they exist otherwise add them
@@ -199,7 +199,7 @@ declare -A settings=(
     ["display_rotate"]="0"
     ["gpu_mem"]="32"
 )
-CONFIG_FILE="${CONFIG_FILE:-/boot/config.txt.test}"
+CONFIG_FILE="${CONFIG_FILE:-/boot/config.txt}"
 for key in "${!settings[@]}"; do
     value="${settings[$key]}"
     if grep -q "^${key}=" "$CONFIG_FILE"; then
@@ -209,7 +209,11 @@ for key in "${!settings[@]}"; do
     fi
 done
 '
+
+sudo raspi-config 
+
 ````
+- ``sudo raspi-config `` -> ``Advanced Settings`` -> ``GL Driver`` -> ``Legacy Drivers`` -> ``Yes``
 
 # Development
 
