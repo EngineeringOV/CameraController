@@ -83,7 +83,7 @@ sudo dphys-swapfile swapon
 sudo sed -i -e 's/\bconsole=tty[0-9]\+/console=tty3/' \
             -e '/rootwait/!b;s/\brootwait\b/& quiet loglevel=3 logo.nologo nosplash cma=375M/' \
             -e 's/quiet[^ ]*//g;s/loglevel=[^ ]*//g;s/logo\.nologo//g;s/nosplash//g;s/cma=[^ ]*//g' \
-            -e '/rootwait/s/$/ quiet loglevel=3 logo.nologo nosplash cma=350M/' /boot/cmdline.txt
+            -e '/rootwait/s/$/ quiet loglevel=3 logo.nologo nosplash cma=375M/' /boot/cmdline.txt
 
 
 # Set config.txt fields if they exist otherwise add them
