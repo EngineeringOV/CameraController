@@ -41,7 +41,7 @@ public class CameraController {
                 .contrast(cs.getContrast().asDouble())
                 //.noPreview()
                 .timeout(60000)
-                .outputDirAndName(ce.getVIDEO_DIR() + StringUtil.getCurrentTime() + ".h264")
+                .outputDirAndName(ce.getVideoDir() + StringUtil.getCurrentTime() + ".h264")
                 .denoise("cdn_off")
                 .verbose(ce.getVerboseCamera())
                 .findAppropriateResolution()
@@ -53,7 +53,7 @@ public class CameraController {
                 .builder()
                 .timeBetweenImagesTimelapse((Long) cs.getTlTimeBetween().getActualValue())
                 .timeoutDisabled()
-                .outputDirNoName(ce.getTIMELAPSE_DIR() + StringUtil.getCurrentTime())
+                .outputDirNoName(ce.getTimelapseDir() + StringUtil.getCurrentTime())
                 .timestamp()
                 .shutter(cs.getShutterTime().asLong())
                 .gain(cs.getGain().asDouble())
@@ -62,7 +62,7 @@ public class CameraController {
                 .denoise("cdn_hq")
                 .quality(100)
                 .verbose(ce.getVerboseCamera())
-                .latest(CameraEnvironment.getLATEST_FILE())
+                .latest(CameraEnvironment.getLatestFile())
                 .findAppropriateResolution()
                 .build();
     }
@@ -71,7 +71,7 @@ public class CameraController {
         return CameraStringBuilder
                 .builder()
                 .timeoutDisabled()
-                .outputDirNoName(ce.getIMAGES_DIR())
+                .outputDirNoName(ce.getImagesDir())
                 .timestamp()
                 .signal()
                 .shutter(cs.getShutterTime().asLong())
@@ -81,14 +81,14 @@ public class CameraController {
                 .denoise("cdn_hq")
                 .quality(100)
                 .verbose(ce.getVerboseCamera())
-                .latest(CameraEnvironment.getLATEST_FILE())
+                .latest(CameraEnvironment.getLatestFile())
                 .findAppropriateResolution()
                 .build();
     }
 
     public CameraController(MasterController masterController) {
         this.masterController = masterController;
-        File latest = new File(CameraEnvironment.getLATEST_FILE());
+        File latest = new File(CameraEnvironment.getLatestFile());
         latest.delete();
         cameraStatus = CameraStates.READY;
     }
@@ -108,7 +108,7 @@ public class CameraController {
     public Void triggerTimelapse() {
         if (cameraStatus.equals(CameraStates.READY)) {
             cameraStatus = CameraStates.NOT_READY_TIMELAPSE;
-            FileUtil.writeToFile(ce.getTIMELAPSE_DIR()+"settings.json", cs.toJson());
+            FileUtil.writeToFile(ce.getTimelapseDir()+"settings.json", cs.toJson());
             ledBlinking();
             maximizeWindow(tempZero2WindowAppearTimer);
             String tlCommand = buildTimelapseString();

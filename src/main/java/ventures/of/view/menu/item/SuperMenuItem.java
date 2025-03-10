@@ -8,26 +8,12 @@ import java.util.function.Function;
 @Data
 @NoArgsConstructor
 public class SuperMenuItem extends MenuItemInterface {
-    Function<Void, String> name;
-    String value;
-    Function<Void, Void> actionClick;
-    Function<Void, Void> changeFromInMenu;
+    MenuItemSetting[] settings;
+    //todo index to track current setting
 
-    public SuperMenuItem(Function<Void, String> name, Function<Void, Void> actionClick) {
-        this.name = name;
-        this.actionClick = actionClick;
-        this.changeFromInMenu = null;
-    }
-
-    public SuperMenuItem(String name, Function<Void, Void> actionClick) {
+    public SuperMenuItem(String name, DirectMenuItem... settings) {
         this.name = ((e) -> name);
-        this.actionClick = actionClick;
-        this.changeFromInMenu = null;
-    }
-
-    public SuperMenuItem(String name, Function<Void, Void> actionClick, Function<Void, Void> changeFromInMenu) {
-        this(name, actionClick);
-        this.changeFromInMenu = changeFromInMenu;
+        this.settings = settings;
     }
 
 }

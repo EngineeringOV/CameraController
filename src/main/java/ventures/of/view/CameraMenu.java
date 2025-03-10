@@ -8,7 +8,9 @@ import ventures.of.controller.MasterController;
 import ventures.of.model.ValueWithIndex;
 import ventures.of.util.*;
 import ventures.of.view.menu.item.DirectMenuItem;
+import ventures.of.view.menu.item.MenuItemInterface;
 import ventures.of.view.menu.item.MenuItemSetting;
+import ventures.of.view.menu.item.SuperMenuItem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,11 +60,14 @@ public class CameraMenu {
     private DirectMenuItem startSnapshot = new DirectMenuItem("Start snapshot", (e -> masterController.cameraController.triggerTakeStill()));
 
     // MENU free items
-    private DirectMenuItem[] settings;
+    private MenuItemInterface[] settings;
     private Font labelFont;
     private SelectedLabel selectedLabel;
     private BatteryLabel infoLabel;
     private CameraMenuFrame window;
+
+    //wip super menu
+    private SuperMenuItem superMenuItem;
 
     public CameraMenu(MasterController masterController) {
         this.masterController = masterController;
@@ -73,6 +78,7 @@ public class CameraMenu {
         ValueWithIndex contrast = masterController.cameraController.getCs().getContrast();
 
         shutterItem = new MenuItemSetting("Shutter",shutterTime);
+
         gainItem = new MenuItemSetting("Gain",  gain, "db");
         contrastItem = new MenuItemSetting("Contrast",  contrast, "");
         timeBetweenItem = new MenuItemSetting("TL time", timeBetween);
@@ -81,16 +87,18 @@ public class CameraMenu {
             return null;
         }));
 
+        superMenuItem = new SuperMenuItem("PHOTO", shutterItem, gainItem, contrastItem, timeBetweenItem, restoreDefaultsItem);
         if(touchEnabled) {
-            settings = new DirectMenuItem[]{toggleMenuItem, shutdownItem, rebootItem, maximizeItem, killCamItem,
+            settings = new MenuItemInterface[]{toggleMenuItem, shutdownItem, rebootItem, maximizeItem, killCamItem,
                     /*toggleWifi,*/ showLastImage, timeBetweenItem, shutterItem, gainItem,
-                    contrastItem, restoreDefaultsItem, startVideo, startTimelapse, startSnapshot};
+                    contrastItem, restoreDefaultsItem, startVideo, startTimelapse, startSnapshot, superMenuItem};
         }
         else {
-            settings = new DirectMenuItem[]{toggleMenuItem, shutdownItem, rebootItem, maximizeItem, killCamItem,
+            settings = new MenuItemInterface[]{toggleMenuItem, shutdownItem, rebootItem, maximizeItem, killCamItem,
                     /*toggleWifi,*/ showLastImage, timeBetweenItem, shutterItem, gainItem,
-                    contrastItem, restoreDefaultsItem};
+                    contrastItem, restoreDefaultsItem, superMenuItem};
         }
+        //todo graphic for super items
         labelFont = new Font(new JLabel().getFont().getName(), Font.BOLD, 20);
         selectedLabel = new SelectedLabel(settings[currentItem].getName().apply(null), labelFont);
         infoLabel = new BatteryLabel(masterController.batteryController.buildInfoText(), labelFont);
@@ -152,7 +160,7 @@ public class CameraMenu {
         return null;
     }
 
-    public DirectMenuItem getCurrentMainItem() {
+    public MenuItemInterface getCurrentMainItem() {
         return settings[currentItem];
     }
 

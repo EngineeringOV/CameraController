@@ -8,10 +8,7 @@ import java.util.function.Function;
 @Data
 @NoArgsConstructor
 public class DirectMenuItem extends MenuItemInterface{
-    Function<Void, String> name;
     String value;
-    Function<Void, Void> actionClick;
-    Function<Void, Void> changeFromInMenu;
 
     public DirectMenuItem(Function<Void, String> name, Function<Void, Void> actionClick) {
         this.name = name;

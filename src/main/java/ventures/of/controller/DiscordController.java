@@ -117,7 +117,7 @@ public class DiscordController extends ListenerAdapter {
                 }
             }
             else if (messageContent.equalsIgnoreCase("!latestImg") || messageContent.equalsIgnoreCase("l")) {
-                File image = new File(CameraEnvironment.getLATEST_FILE());
+                File image = new File(CameraEnvironment.getLatestFile());
                 InputStream inputStream;
                 try {
                     inputStream = new FileInputStream(image);
