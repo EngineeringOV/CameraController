@@ -8,7 +8,7 @@ import java.util.function.Function;
 @Data
 @NoArgsConstructor
 public class SuperMenuItem extends MenuItemInterface {
-    MenuItemSetting[] settings;
+    DirectMenuItem[] settings;
     //todo index to track current setting
 
     public SuperMenuItem(String name, DirectMenuItem... settings) {

@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 import static ventures.of.util.StringUtil.printVerbose;
 
-//todo Hi-prio super menuItems which contain others, so maybe one for settings etc
+//todo Hi-prio super menuItems which contain others, so maybe one for settings etc but still allow free standing menuItems
 @Data
 @NoArgsConstructor
 public class CameraMenu {
